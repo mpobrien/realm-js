@@ -26,7 +26,7 @@ const xcode = require("./xcode-cli");
 /**
  * Ensure the simulator is created and booted
  */
-function ensureSimulator(deviceName, deviceTypeId) {
+function ensureSimulator(deviceName, deviceTypeId, deleteExisting = false) {
     const version = xcode.xcrun("--version").stdout.trim();
     console.log(`Using ${version}`);
 
@@ -46,10 +46,15 @@ function ensureSimulator(deviceName, deviceTypeId) {
     // Filter devices, so we're only focussing on devices of the expected name
     const devices = availableDevices.filter(({ name }) => name === deviceName);
 
-    // Delete any existing devices with the expected name
-    for (const device of devices) {
-        console.log(`Deleting simulator (id = ${device.udid})`);
-        xcode.simctl.delete(device.udid);
+    if (deleteExisting) {
+        // Delete any existing devices with the expected name
+        for (const device of devices) {
+            console.log(`Deleting simulator (id = ${device.udid})`);
+            xcode.simctl.delete(device.udid);
+        }
+    } else if (devices.length > 0) {
+        // Use the first device with the expected name
+        return devices[0].udid;
     }
 
     const { runtimes } = xcode.simctl.list('runtimes', 'ios');
@@ -57,6 +62,7 @@ function ensureSimulator(deviceName, deviceTypeId) {
     if (!runtime) {
         throw new Error("No available iOS runtimes");
     }
+
     // Create the device
     const { stdout } = xcode.simctl.create(deviceName, deviceTypeId, runtime.identifier);
     const deviceId = stdout.trim();
@@ -122,7 +128,7 @@ async function runApp(platform, junitFilePath) {
 
     // Run tests with a 5 minute timeout
     return timeout(new Promise((resolve) => {
-        console.log("Running tests 🏃‍♂️");
+        console.log("Running tests 🏃‍");
         server.run(resolve);
     }), 60000 * 5);
 }
