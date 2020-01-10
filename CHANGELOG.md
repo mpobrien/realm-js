@@ -4,7 +4,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* On React Native, when using libraries that defines the `atob` global, users would experience our library incorrectly assuming it was running via the remote (Chrome) debugger. (https://github.com/realm/realm-js/issues/2294, since v2.0.3).
+* On React Native, when using libraries that define the `atob` global, users would experience our library incorrectly assuming it was running via the remote (Chrome) debugger. ([#2294](https://github.com/realm/realm-js/issues/2294), since v2.0.3)
 
 ### Compatibility
 * Realm Object Server: 3.23.1 or later.
